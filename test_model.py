@@ -7,6 +7,8 @@ from timeit import timeit
 
 JULIA_PATH = "/home/wolinammentorp/julia-1.8.2/bin/julia"
 DEVICE_NAME = "NVIDIA A100 40 GB"
+IDLE_POWER_FILENAME = "idle_power.csv"
+ACTIVE_POWER_FILENAME = "power_output.csv"
 
 parser = argparse.ArgumentParser(description="Options")
 #parser.add_argument('--output', type = str, default = "run.csv")
@@ -15,8 +17,16 @@ parser.add_argument('--samples', type = int, default = 100)
 args = parser.parse_args()
 
 
-def launch_power_check():
-    return sp.Popen([JULIA_PATH, "track_gpu_power.jl",])
+def launch_power_check(sample_time: float = 2.00, 
+                    poll_time = 0.010, 
+                    filename: str = "power_output.csv"):
+
+    return sp.Popen([JULIA_PATH, 
+                "track_gpu_power.jl", 
+                "--sample_time=" + sample_time,
+                "--poll_time=" + poll_time,
+                "--filename=" + filename,
+                ])
     
 def setup(model: str = "EfficientNetB0", image_shape: tuple = (400, 400, 1)):
     n_batch = 1
@@ -41,10 +51,13 @@ def test_latency(call_fn, n_samples: int):
     print("Total time elapsed", t_total)
     return t_avg
 
+#check the GPU idle power for baseline
+proc = launch_power_check(filename=IDLE_POWER_FILENAME)
+proc.wait()
 #initialize the neural network on device
 call = setup(model = args.model)
 #launch the power tracking program asynchronously
-proc = launch_power_check()
+proc = launch_power_check(filename=ACTIVE_POWER_FILENAME)
 #repeatedly call the inference function to test latency
 t_avg = test_latency(call, args.samples)
 print("Average latency", t_avg)
@@ -53,10 +66,13 @@ proc.terminate()
 
 #load and format the data to a single file
 filename = "test_" + args.model + ".p"
-power = pd.read_csv("power_output.csv")
+idle_power = pd.read_csv(IDLE_POWER_FILENAME)
+power = pd.read_csv(ACTIVE_POWER_FILENAME)
+
 data = {"latency" : t_avg,
         "samples" : args.samples,
         "device" : DEVICE_NAME,
         "model" : args.model,
-        "power" : power,}
+        "active power" : power,
+        "idle power" : idle_power,}
 p.dump(data, open(filename, "wb"))

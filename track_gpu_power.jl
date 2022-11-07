@@ -1,12 +1,16 @@
 using ArgParse
 
+arg_table = ArgParseSettings()
+
 @add_arg_table arg_table begin
     "--sample_time"
         help = "Amount of time to run power sampling"
         default = 2.00
+        arg_type = Float64
     "--poll_time"
         help = "Amount of time to delay between sampling power"
         default = 0.010
+        arg_type = Float64
     "--filename"
         help = "Name of the file to write output to"
         default = "power_output.csv"
