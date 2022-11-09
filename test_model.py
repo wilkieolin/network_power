@@ -2,7 +2,7 @@ import subprocess as sp
 import tensorflow as tf
 import argparse
 import pickle as p
-import pandas as pd
+import numpy as np
 from timeit import timeit
 
 JULIA_PATH = "/home/wolinammentorp/julia-1.8.2/bin/julia"
@@ -23,13 +23,13 @@ def launch_power_check(sample_time: float = 2.00,
 
     return sp.Popen([JULIA_PATH, 
                 "track_gpu_power.jl", 
-                "--sample_time=" + sample_time,
-                "--poll_time=" + poll_time,
+                "--sample_time=" + str(sample_time),
+                "--poll_time=" + str(poll_time),
                 "--filename=" + filename,
                 ])
     
 def setup(model: str = "EfficientNetB0", image_shape: tuple = (400, 400, 1)):
-    n_batch = 1
+    n_batch = 100
     shape = (n_batch, *image_shape)
     sample = tf.random.uniform(shape)
 
@@ -66,8 +66,8 @@ proc.terminate()
 
 #load and format the data to a single file
 filename = "test_" + args.model + ".p"
-idle_power = pd.read_csv(IDLE_POWER_FILENAME)
-power = pd.read_csv(ACTIVE_POWER_FILENAME)
+idle_power = np.genfromtxt(IDLE_POWER_FILENAME, delimiter=',')
+power = np.genfromtxt(ACTIVE_POWER_FILENAME, delimiter=',')
 
 data = {"latency" : t_avg,
         "samples" : args.samples,

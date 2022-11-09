@@ -46,7 +46,7 @@ for i in 1:max_samples
     m = match(power_regex, s)
 
     #return -1 for capture error
-    if m == nothing
+    if m === nothing
         append!(p_samples, -1)
     else
         capture = String(m.captures[1])
