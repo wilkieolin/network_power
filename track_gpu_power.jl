@@ -14,12 +14,17 @@ arg_table = ArgParseSettings()
     "--filename"
         help = "Name of the file to write output to"
         default = "power_output.csv"
+    "--cuda_device"
+        help = "CUDA device to track power on"
+        default = 0
+        arg_type = Int64
 end
 
 #load arguments parsed from the command line
 args = parse_args(ARGS, arg_table)
 poll_time = args["poll_time"]
 max_time = args["sample_time"]
+cuda_device = args["cuda_device"]
 max_samples = Int(floor(max_time / poll_time))
 filename = args["filename"]
 
@@ -49,7 +54,8 @@ for i in 1:max_samples
     if m === nothing
         append!(p_samples, -1)
     else
-        capture = String(m.captures[1])
+        #offset device by 1 for index-by-one
+        capture = String(m.captures[cuda_device+1])
         append!(p_samples, [capture])
     end
 

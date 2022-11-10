@@ -14,6 +14,7 @@ parser = argparse.ArgumentParser(description="Options")
 #parser.add_argument('--output', type = str, default = "run.csv")
 parser.add_argument('--model', type = str, default = "EfficientNetB0")
 parser.add_argument('--samples', type = int, default = 100)
+parser.add_argument('--cuda_device', type = int, default = 0)
 args = parser.parse_args()
 
 
@@ -43,6 +44,12 @@ def setup(model: str = "EfficientNetB0", image_shape: tuple = (400, 400, 1)):
     print("Setup done")
     return call_fn
 
+def set_gpu(device: int):
+    physical_devices = tf.config.list_physical_devices("GPU")
+    assert device < len(physical_devices), "Requested CUDA device out of bounds"
+    tf.config.set_visible_devices(physical_devices[device])
+    print("Device set")
+
 
 def test_latency(call_fn, n_samples: int):
     t_total = timeit(call_fn, number = n_samples)
@@ -52,12 +59,13 @@ def test_latency(call_fn, n_samples: int):
     return t_avg
 
 #check the GPU idle power for baseline
-proc = launch_power_check(filename=IDLE_POWER_FILENAME)
+power_call = lambda x: launch_power_check(filename = x, cuda_device = args.cuda_device)
+proc = power_call(IDLE_POWER_FILENAME)
 proc.wait()
 #initialize the neural network on device
 call = setup(model = args.model)
 #launch the power tracking program asynchronously
-proc = launch_power_check(filename=ACTIVE_POWER_FILENAME)
+proc = power_call(ACTIVE_POWER_FILENAME)
 #repeatedly call the inference function to test latency
 t_avg = test_latency(call, args.samples)
 print("Average latency", t_avg)
