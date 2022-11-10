@@ -25,7 +25,6 @@ args = parse_args(ARGS, arg_table)
 poll_time = args["poll_time"]
 max_time = args["sample_time"]
 cuda_device = args["cuda_device"]
-max_samples = Int(floor(max_time / poll_time))
 filename = args["filename"]
 
 
@@ -45,23 +44,36 @@ function write_to_file()
 end
 
 p_samples = []
+done = false
+elapsed_t = 0.0
+
 #run up to a certain time limit
-for i in 1:max_samples
-    s = read(nvs, String)
+while elapsed_t < max_time
+    res = @timed read(nvs, String)
+    t = res.time
+    global elapsed_t += t
+
+    s = split(res.value, "\n")
     print(s)
-    m = match(power_regex, s)
+    #move up by 1 line and 0 to 1 index offset
+    m = map(x->match(power_regex, x), s)[cuda_device + 2]
 
     #return -1 for capture error
     if m === nothing
         append!(p_samples, -1)
     else
         #offset device by 1 for index-by-one
-        capture = String(m.captures[cuda_device+1])
+        print(m.captures)
+        capture = String(m.captures[1])
         append!(p_samples, [capture])
     end
 
     write_to_file()
-    sleep(poll_time)
+
+    waiting_t = poll_time - elapsed_t
+    if waiting_t > 0
+       sleep(waiting_t)
+    end
 end
 
 #print(p_samples)
