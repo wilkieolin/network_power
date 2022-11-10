@@ -15,6 +15,7 @@ parser = argparse.ArgumentParser(description="Options")
 parser.add_argument('--model', type = str, default = "EfficientNetB0")
 parser.add_argument('--samples', type = int, default = 100)
 parser.add_argument('--cuda_device', type = int, default = 0)
+parser.add_argument('--sample_time', type = float, default = 4.0)
 args = parser.parse_args()
 
 
@@ -61,7 +62,7 @@ def test_latency(call_fn, n_samples: int):
     return t_avg
 
 #check the GPU idle power for baseline
-power_call = lambda x: launch_power_check(filename = x, cuda_device = args.cuda_device)
+power_call = lambda x: launch_power_check(filename = x, cuda_device = args.cuda_device, sample_time = sample_time)
 proc = power_call(IDLE_POWER_FILENAME)
 proc.wait()
 #initialize the neural network on device
