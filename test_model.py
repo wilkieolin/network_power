@@ -20,13 +20,15 @@ args = parser.parse_args()
 
 def launch_power_check(sample_time: float = 2.00, 
                     poll_time = 0.010, 
-                    filename: str = "power_output.csv"):
+                    filename: str = "power_output.csv",
+                    cuda_device: int = 0):
 
     return sp.Popen([JULIA_PATH, 
                 "track_gpu_power.jl", 
                 "--sample_time=" + str(sample_time),
                 "--poll_time=" + str(poll_time),
                 "--filename=" + filename,
+                "--cuda_device=" + str(cuda_device),
                 ])
     
 def setup(model: str = "EfficientNetB0", image_shape: tuple = (400, 400, 1)):
