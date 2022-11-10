@@ -48,6 +48,7 @@ p_samples = []
 #run up to a certain time limit
 for i in 1:max_samples
     s = read(nvs, String)
+    print(s)
     m = match(power_regex, s)
 
     #return -1 for capture error
