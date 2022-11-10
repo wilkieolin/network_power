@@ -61,6 +61,7 @@ def test_latency(call_fn, n_samples: int):
     print("Total time elapsed", t_total)
     return t_avg
 
+set_gpu(args.cuda_device)
 #check the GPU idle power for baseline
 power_call = lambda x: launch_power_check(filename = x, cuda_device = args.cuda_device, sample_time = args.sample_time)
 proc = power_call(IDLE_POWER_FILENAME)
