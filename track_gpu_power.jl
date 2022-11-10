@@ -54,7 +54,7 @@ while elapsed_t < max_time
     global elapsed_t += t
 
     s = split(res.value, "\n")
-    print(s)
+    #print(s)
     #move up by 1 line and 0 to 1 index offset
     m = map(x->match(power_regex, x), s)[cuda_device + 2]
 
@@ -63,7 +63,7 @@ while elapsed_t < max_time
         append!(p_samples, -1)
     else
         #offset device by 1 for index-by-one
-        print(m.captures)
+        #print(m.captures)
         capture = String(m.captures[1])
         append!(p_samples, [capture])
     end
