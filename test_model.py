@@ -5,7 +5,7 @@ import pickle as p
 import numpy as np
 from timeit import timeit
 
-JULIA_PATH = "/home/wolinammentorp/julia-1.8.2/bin/julia"
+JULIA_PATH = "/home/cc/julia-1.8.2/bin/julia"
 DEVICE_NAME = "NVIDIA A100 40 GB"
 IDLE_POWER_FILENAME = "idle_power.csv"
 ACTIVE_POWER_FILENAME = "power_output.csv"
