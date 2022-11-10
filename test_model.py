@@ -50,7 +50,7 @@ def setup(model: str = "EfficientNetB0", image_shape: tuple = (400, 400, 1)):
 def set_gpu(device: int):
     physical_devices = tf.config.list_physical_devices("GPU")
     assert device < len(physical_devices), "Requested CUDA device out of bounds"
-    tf.config.set_visible_devices(physical_devices[device])
+    tf.config.set_visible_devices(physical_devices[device], "GPU")
     print("Device set")
 
 
