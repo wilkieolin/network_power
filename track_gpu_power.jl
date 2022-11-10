@@ -62,9 +62,8 @@ while elapsed_t < max_time
     if m === nothing
         append!(p_samples, -1)
     else
-        #offset device by 1 for index-by-one
-        #print(m.captures)
-        capture = String(m.captures[1])
+        #offset device by 1 for index
+        capture = String(m.captures[cuda_device+1])
         append!(p_samples, [capture])
     end
 

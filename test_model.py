@@ -62,7 +62,7 @@ def test_latency(call_fn, n_samples: int):
     return t_avg
 
 #check the GPU idle power for baseline
-power_call = lambda x: launch_power_check(filename = x, cuda_device = args.cuda_device, sample_time = sample_time)
+power_call = lambda x: launch_power_check(filename = x, cuda_device = args.cuda_device, sample_time = args.sample_time)
 proc = power_call(IDLE_POWER_FILENAME)
 proc.wait()
 #initialize the neural network on device
